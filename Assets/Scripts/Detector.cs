@@ -8,13 +8,13 @@ public class Detector : MonoBehaviour
 
     private void OnTriggerEnter(Collider collider)
     {
-        if (collider.gameObject.TryGetComponent(out Mover Crook))
+        if (collider.gameObject.TryGetComponent(out Mover crook))
             OnEntered?.Invoke();
     }
 
     private void OnTriggerExit(Collider collider)
     {
-        if (collider.gameObject.TryGetComponent(out Mover Crook))
+        if (collider.gameObject.TryGetComponent(out Mover crook))
             OnExited?.Invoke();
     }
 }
