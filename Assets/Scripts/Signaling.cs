@@ -7,6 +7,7 @@ public class Signaling : MonoBehaviour
 {
     [SerializeField] private Detector _detector;
 
+    private bool _isAlarm;
     private float _volumeStep;
     private float _maxVolume;
     private AudioSource _audioSource;
@@ -14,8 +15,8 @@ public class Signaling : MonoBehaviour
 
     private void Awake()
     {
-        //_alarm = false;
-        _volumeStep = 0.5f;
+        _isAlarm = false;
+        _volumeStep = 0.2f;
         _maxVolume = 1f;
 
         _audioSource = GetComponent<AudioSource>();
@@ -38,29 +39,36 @@ public class Signaling : MonoBehaviour
 
     private void HandleEntered()
     {
-        _audioSource.Play();
-        StopCoroutine(ChangeVolume(0));
-        StartCoroutine(ChangeVolume(_maxVolume));
+        _isAlarm = true;
+        StartCoroutine(OnAlarm());
     }
 
     private void HandleExited()
     {
-        StopCoroutine(ChangeVolume(_maxVolume));
-        StartCoroutine(ChangeVolume(0));
+        _isAlarm = false;
+        StartCoroutine(OffAlarm());
     }
 
-    private IEnumerator ChangeVolume(float targetVolume)
+    private IEnumerator OnAlarm()
     {
-        float currentVolume = _audioSource.volume;
-        float duration = Mathf.Abs(targetVolume - currentVolume) / _volumeStep;
-        float elapsedTime = 0f;
+        _audioSource.Play();
 
-        while (elapsedTime < duration)
+        while (_isAlarm)
         {
-            elapsedTime += Time.deltaTime;
-            _audioSource.volume = Mathf.Lerp(currentVolume, targetVolume, elapsedTime / duration);
-
+            _audioSource.volume = Mathf.MoveTowards(_audioSource.volume, _maxVolume, _volumeStep * Time.deltaTime);
             yield return null;
         }
+    }
+
+    private IEnumerator OffAlarm()
+    {
+        while (_audioSource.volume > 0 && _isAlarm == false)
+        {
+            _audioSource.volume = Mathf.MoveTowards(_audioSource.volume, 0, _volumeStep * Time.deltaTime);
+            yield return null;
+        }
+
+        if (_audioSource.volume == 0 && _isAlarm == false)
+            _audioSource.Stop();
     }
 }

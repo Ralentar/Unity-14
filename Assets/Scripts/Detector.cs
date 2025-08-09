@@ -1,10 +1,11 @@
+using System;
 using UnityEngine;
 
 public class Detector : MonoBehaviour
 {
-    public delegate void DetectedHandler();
-    public event DetectedHandler OnEntered;
-    public event DetectedHandler OnExited;
+    //public delegate void DetectedHandler();
+    public event Action OnEntered;
+    public event Action OnExited;
 
     private void OnTriggerEnter(Collider collider)
     {
